@@ -10,10 +10,7 @@ struct PathedIoError {
 
 impl std::fmt::Debug for PathedIoError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("PathedIoError")
-            .field("path", &self.path)
-            .field("inner", &self.inner)
-            .finish()
+        write!(f, "for file {:?}: {}", self.path, self.inner)
     }
 }
 
