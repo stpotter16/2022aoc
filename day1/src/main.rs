@@ -1,9 +1,16 @@
-fn main() {
-    let input = read_input().unwrap();
+use color_eyre::eyre::Context;
+
+fn main() -> color_eyre::Result<()> {
+    color_eyre::install()?;
+
+    let input = read_input()?;
     println!("{input}");
+
+    Ok(())
 }
 
-fn read_input() -> Result<String, std::io::Error> {
+fn read_input() -> color_eyre::Result<String> {
     let path = "src/foobar.txt";
-    fs_err::read_to_string(path)
+    let input = std::fs::read_to_string(path).wrap_err("reading src/input.txt")?;
+    Ok(input)
 }
