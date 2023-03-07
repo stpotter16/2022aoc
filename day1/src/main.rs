@@ -1,15 +1,20 @@
+use itertools::Itertools;
+
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
 
-    let lines = include_str!("input.txt")
+    let max = include_str!("input.txt")
         .lines()
         .map(|v| v.parse::<u64>().ok())
-        .collect::<Vec<_>>();
-    let groups = lines
-        .split(|line| line.is_none())
-        .map(|group| group.iter().map(|v| v.unwrap()).sum::<u64>())
+        .batching(|it| {
+            let mut sum = None;
+            while let Some(Some(v)) = it.next() {
+                sum = Some(sum.unwrap_or(0) + v);
+            }
+            sum
+        })
         .max();
-    println!("groups = {groups:?}");
+        println!("{max:?}");
 
     Ok(())
 }
