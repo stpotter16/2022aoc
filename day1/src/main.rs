@@ -3,7 +3,7 @@ use itertools::Itertools;
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
 
-    let max = include_str!("input.txt")
+    let answer = include_str!("input.txt")
         .lines()
         .map(|v| v.parse::<u64>().ok())
         .batching(|it| {
@@ -13,8 +13,10 @@ fn main() -> color_eyre::Result<()> {
             }
             sum
         })
-        .max();
-        println!("{max:?}");
+        .sorted_by_key(|&v| u64::MAX -v)
+        .take(3)
+        .sum::<u64>();
+        println!("{answer:?}");
 
     Ok(())
 }
