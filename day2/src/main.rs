@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use itertools::{process_results, Itertools};
 
 #[derive(Debug, Clone, Copy)]
 enum Move {
@@ -105,7 +106,7 @@ fn main() -> color_eyre::Result<()> {
         include_str!("input.txt")
             .lines()
             .map(Round::from_str)
-            .map(|r| r.map(|r| r.our_score())),
+            .map_ok(|r| r.our_score()),
         |it| it.sum()
         )?;
     dbg!(total_score);
