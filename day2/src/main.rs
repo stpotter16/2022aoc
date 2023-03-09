@@ -101,17 +101,13 @@ impl Round {
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
 
-    for round in include_str!("input.txt")
+    let rounds: Vec<Round> = include_str!("input.txt")
         .lines()
-        .map(|line| line.parse::<Round>())
-        {
-            let round = round?;
-            println!(
-                "{round:?} outcome={outcome:?}, our score={our_score}",
-                outcome = round.outcome(),
-                our_score = round.our_score()
-            );
-        }
+        .map(|line| line.parse())
+        .collect::<Result<_, _>>()?;
+
+    let total_score: usize = rounds.iter().map(|r| r.our_score()).sum();
+    dbg!(total_score);
 
     Ok(())
 }
