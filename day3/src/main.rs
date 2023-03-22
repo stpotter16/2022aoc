@@ -39,7 +39,7 @@ use std::collections::HashSet;
 use item::Item;
 
 fn main()-> color_eyre::Result<()> {
-    let sum = include_str!("test.txt")
+    let sum = include_str!("input.txt")
         .lines()
         .map(|line| -> color_eyre::Result<_> {
             let (first, second) = line.split_at(line.len() / 2);
