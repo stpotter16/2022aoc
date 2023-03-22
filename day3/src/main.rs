@@ -38,11 +38,19 @@ use item::Item;
 
 fn main()-> color_eyre::Result<()> {
     for line in include_str!("test.txt").lines() {
-        let items = line
+        let (first, second) = line.split_at(line.len() / 2);
+
+        let first_items = first 
             .bytes()
             .map(Item::try_from)
             .collect::<Result<Vec<_>, _>>()?;
-        println!("- {items:?}");
+
+        let second_items = second
+            .bytes()
+            .map(Item::try_from)
+            .collect::<Result<Vec<_>, _>>()?;
+
+        println!("- {first_items:?} | {second_items:?}");
     }
 
     Ok(())
