@@ -1,6 +1,6 @@
 mod item {
     #[repr(transparent)]
-    #[derive(Clone, Copy)]
+    #[derive(Clone, Copy, PartialEq)]
     pub(crate) struct Item(u8);
 
     impl TryFrom<u8> for Item {
@@ -37,6 +37,8 @@ mod item {
 use item::Item;
 
 fn main()-> color_eyre::Result<()> {
+    let mut total_score = 0;
+
     for line in include_str!("test.txt").lines() {
         let (first, second) = line.split_at(line.len() / 2);
 
@@ -45,13 +47,23 @@ fn main()-> color_eyre::Result<()> {
             .map(Item::try_from)
             .collect::<Result<Vec<_>, _>>()?;
 
-        let second_items = second
+        let dupe_score = second
             .bytes()
             .map(Item::try_from)
-            .collect::<Result<Vec<_>, _>>()?;
-
-        println!("- {first_items:?} | {second_items:?}");
+            .find_map(|item| {
+                item.ok().and_then(|item| {
+                    first_items
+                        .iter()
+                        .copied()
+                        .find(|&first_item| first_item == item)
+                })
+            })
+            .expect("There should be exactly one duplicate")
+            .score();
+        dbg!(dupe_score);
+        total_score += dupe_score;
     }
 
+    dbg!(total_score);
     Ok(())
 }
