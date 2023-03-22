@@ -37,9 +37,13 @@ mod item {
 use item::Item;
 
 fn main()-> color_eyre::Result<()> {
-    let a = Item::try_from(b'a')?;
-    a.score();
-    a.score();
+    for line in include_str!("test.txt").lines() {
+        let items = line
+            .bytes()
+            .map(Item::try_from)
+            .collect::<Result<Vec<_>, _>>()?;
+        println!("- {items:?}");
+    }
 
     Ok(())
 }
