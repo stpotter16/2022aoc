@@ -1,6 +1,6 @@
 mod item {
     #[repr(transparent)]
-    #[derive(Clone, Copy, PartialEq)]
+    #[derive(Clone, Copy, PartialEq, Eq, Hash)]
     pub(crate) struct Item(u8);
 
     impl TryFrom<u8> for Item {
@@ -34,6 +34,8 @@ mod item {
     }
 }
 
+use std::collections::HashSet;
+
 use item::Item;
 
 fn main()-> color_eyre::Result<()> {
@@ -45,7 +47,7 @@ fn main()-> color_eyre::Result<()> {
         let first_items = first 
             .bytes()
             .map(Item::try_from)
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<HashSet<_>, _>>()?;
 
         let dupe_score = second
             .bytes()
