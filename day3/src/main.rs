@@ -39,33 +39,21 @@ use std::collections::HashSet;
 use item::Item;
 
 fn main()-> color_eyre::Result<()> {
-    let mut total_score = 0;
-
-    for line in include_str!("test.txt").lines() {
-        let (first, second) = line.split_at(line.len() / 2);
-
-        let first_items = first 
-            .bytes()
-            .map(Item::try_from)
-            .collect::<Result<HashSet<_>, _>>()?;
-
-        let dupe_score = second
-            .bytes()
-            .map(Item::try_from)
-            .find_map(|item| {
-                item.ok().and_then(|item| {
-                    first_items
-                        .iter()
-                        .copied()
-                        .find(|&first_item| first_item == item)
-                })
-            })
-            .expect("There should be exactly one duplicate")
-            .score();
-        dbg!(dupe_score);
-        total_score += dupe_score;
-    }
-
-    dbg!(total_score);
+    let sum = include_str!("test.txt")
+        .lines()
+        .map(|line| -> color_eyre::Result<_> {
+            let (first, second) = line.split_at(line.len() / 2);
+            let first_items = first
+                .bytes()
+                .map(Item::try_from)
+                .collect::<Result<HashSet<_>, _>>()?;
+            itertools::process_results(second.bytes().map(Item::try_from), |mut it| {
+                it.find(|&item| first_items.contains(&item))
+                    .map(|item| dbg!(item.score()))
+                    .ok_or_else(|| color_eyre::eyre::eyre!("compartments have no items that match"))
+            })?
+        })
+        .sum::<color_eyre::Result<usize>>()?;
+    dbg!(sum);
     Ok(())
 }
