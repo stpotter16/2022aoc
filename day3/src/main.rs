@@ -34,29 +34,31 @@ mod item {
     }
 }
 
-use std::collections::HashSet;
-
+use im::HashSet;
 use item::Item;
 use itertools::Itertools;
 
 fn main()-> color_eyre::Result<()> {
-    let rucksacks = include_str!("input.txt").lines().map(|line| {
-        line.bytes()
-            .map(Item::try_from)
-            .collect::<Result<HashSet<_>, _>>()
-    });
+    let sum: usize = include_str!("input.txt")
+        .lines()
+        .map(|line| {
+            line.bytes()
+                .map(|b| b.try_into().unwrap())
+                .collect::<HashSet<Item>>()
+        })
+        .chunks(3)
+        .into_iter()
+        .map(|chunks| {
+            chunks
+                .reduce(|a, b| a.intersection(b))
+                .expect("we always have three chunks")
+                .iter()
+                .next()
+                .expect("there should always be one item in common")
+                .score()
+        })
+        .sum();
 
-    let sum = itertools::process_results(rucksacks, |rs| {
-        rs.tuples()
-            .map(|(a, b, c)| {
-                a.iter()
-                    .copied()
-                    .find(|i| b.contains(i) && c.contains(i))
-                    .map(|i| dbg!(i.score()))
-                    .unwrap_or_default()
-            })
-            .sum::<usize>()
-    })?;
     dbg!(sum);
     Ok(())
 }
