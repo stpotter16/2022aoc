@@ -34,8 +34,7 @@ mod item {
     }
 }
 
-use im::HashSet;
-use item::Item;
+use crate::item::Item;
 use itertools::Itertools;
 
 fn main()-> color_eyre::Result<()> {
@@ -44,18 +43,26 @@ fn main()-> color_eyre::Result<()> {
         .map(|line| {
             line.bytes()
                 .map(|b| b.try_into().unwrap())
-                .collect::<HashSet<Item>>()
+                .fold([false; 53], |mut acc, x: Item| {
+                    acc[x.score()] = true;
+                    acc
+                })
         })
         .chunks(3)
         .into_iter()
         .map(|chunks| {
             chunks
-                .reduce(|a, b| a.intersection(b))
-                .expect("we always have three chunks")
+                .reduce(|a, b| {
+                    let mut res = [false; 53];
+                    for (acc, (a, b)) in res.iter_mut().zip(a.into_iter().zip(b.into_iter())) {
+                        *acc = a && b;
+                    }
+                    res
+                })
+                .expect("we always have 3 chunks")
                 .iter()
-                .next()
-                .expect("there should always be one item in common")
-                .score()
+                .position(|&b| b)
+                .expect("There should be one item in common")
         })
         .sum();
 
