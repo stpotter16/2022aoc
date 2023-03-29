@@ -43,8 +43,8 @@ fn main()-> color_eyre::Result<()> {
         .map(|line| {
             line.bytes()
                 .map(|b| b.try_into().unwrap())
-                .fold([false; 53], |mut acc, x: Item| {
-                    acc[x.score()] = true;
+                .fold([0u8; 53], |mut acc, x: Item| {
+                    acc[x.score()] = 1;
                     acc
                 })
         })
@@ -52,16 +52,15 @@ fn main()-> color_eyre::Result<()> {
         .into_iter()
         .map(|chunks| {
             chunks
-                .reduce(|a, b| {
-                    let mut res = [false; 53];
-                    for (acc, (a, b)) in res.iter_mut().zip(a.into_iter().zip(b.into_iter())) {
-                        *acc = a && b;
+                .reduce(|mut a, b| {
+                    for (a, b) in a.iter_mut().zip(b.iter()) {
+                        *a += *b
                     }
-                    res
+                    a
                 })
                 .expect("we always have 3 chunks")
                 .iter()
-                .position(|&b| b)
+                .position(|&b| b == 3)
                 .expect("There should be one item in common")
         })
         .sum();
