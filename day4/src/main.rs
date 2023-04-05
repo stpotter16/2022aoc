@@ -20,7 +20,7 @@ where
 }
 
 fn main() {
-    let redundant = include_str!("sample.txt")
+    let redundant = include_str!("input.txt")
         .lines()
         .map(|l| {
             l.split(',')
